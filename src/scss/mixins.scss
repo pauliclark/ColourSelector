@@ -1,0 +1,117 @@
+/* mixins */
+
+
+//MIXINS
+
+
+/*Required arguments:
+  		$file, meaning the file name, without the file extensions e.g. Helvetica-webfont
+  Optional arguments:
+		$style-name being the name of the font e.g. Helvetica, overrides font-family if defined
+		$family being the folder inside the fonts folder where the font files are, ignored if undefined
+		$category is serif or sans-serif or monospace etc. as a fall back in CSS, defaults to normal if undefined
+*/
+@mixin font-face($file, $style-name:"", $family:"", $category:"") {
+  $filepath: if(($family != ""), "../fonts/" + $family + "/" + $file, "../fonts/" + $file);
+  $name: if(($style-name != ""),$style-name, $file);
+  @font-face {
+	font-family:"#{$name}";
+	src: url($filepath + ".eot");
+	src: url($filepath + ".eot?#iefix") format('embedded-opentype'),
+	url($filepath + ".woff") format('woff'), url($filepath + ".ttf")
+	format('truetype'), url($filepath + ".svg#" + $style-name + "") format('svg');
+	@if $category != "" {
+	  family: "#{$name}", #{$category};
+	  font-style: normal;
+	}
+	@else {
+	  family: "#{$name}";
+	  weight: normal;
+	  font-style: normal;
+	}
+  }
+}
+
+// Vendor prefixing for shorthand properties
+@mixin vendor-prefixes($property, $value) {
+  -webkit-#{$property}: $value;
+  -moz-#{$property}: $value;
+  -ms-#{$property}: $value;
+  -o-#{$property}: $value;
+}
+@mixin background($text) {
+  background: $text;
+  @include vendor-prefixes(background, $text);
+}
+@mixin transition($text) {
+  transition: $text;
+  @include vendor-prefixes(transition, $text);
+}
+@mixin transform($text) {
+  transform: $text;
+  @include vendor-prefixes(transform, $text);
+}
+@mixin border-radius($radius) {
+  border-radius: $radius;
+  @include vendor-prefixes(border-radius, $radius);
+}
+@mixin opacity($opacity) {
+  opacity: $opacity;
+  $opacity-ie: $opacity * 100;
+  filter: alpha(opacity=$opacity-ie); //IE8
+}
+@mixin box-sizing($box-model) {
+  box-sizing: $box-model;
+  @include vendor-prefixes(box-sizing, $box-model);
+}
+@mixin box-shadow($shadow) {
+  box-sizing: $shadow;
+  @include vendor-prefixes(box-shadow, $shadow);
+}
+@mixin linear-gradient($texts...) {
+  background:-webkit-linear-gradient($texts);
+  background:-moz-linear-gradient($texts);
+  background:linear-gradient($texts);
+}
+//Keyframe Animation
+
+/*
+	e.g.
+
+	  @include keyframes(pulsing) {
+		0%, 100%  { transform:scale(1.2);border-radius:3px;box-shadow:0px 0px 5px #000; }
+		50% { transform:scale(1.3);border-radius:10px;box-shadow:0px 0px 10px #000; }
+	  }
+	  button{
+		  @include animation('pulsing 1s infinite');
+	  }
+*/
+@mixin animation($animate...) {
+  $max: length($animate);
+  $animations: '';
+
+  @for $i from 1 through $max {
+	$animations: #{$animations + nth($animate, $i)};
+
+	@if $i < $max {
+	  $animations: #{$animations + ", "};
+	}
+  }
+  animation: $animations;
+  @include vendor-prefixes(animation, $animations);
+}
+
+@mixin keyframes($animationName) {
+  @-webkit-keyframes #{$animationName} {
+	@content;
+  }
+  @-moz-keyframes #{$animationName} {
+	@content;
+  }
+  @-o-keyframes #{$animationName} {
+	@content;
+  }
+  @keyframes #{$animationName} {
+	@content;
+  }
+}
